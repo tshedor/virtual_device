@@ -4,16 +4,21 @@ import 'package:meta/meta.dart';
 import 'package:virtual_device/virtual_device.dart';
 
 class IosSimulator extends VirtualDevice {
+  @override
   final String model;
 
+  @override
   final String name;
 
+  @override
   final OperatingSystem os;
 
+  @override
   final String osVersion;
 
   final String status;
 
+  @override
   final String uuid;
 
   IosSimulator({
@@ -25,6 +30,7 @@ class IosSimulator extends VirtualDevice {
     this.uuid,
   });
 
+  @override
   Future<IosSimulator> create() async {
     final deviceTypes = await availableDeviceTypes();
     final deviceType = deviceTypes[model];
@@ -54,12 +60,16 @@ class IosSimulator extends VirtualDevice {
     );
   }
 
+  @override
   Future<void> delete() => Process.run('xcrun', ['simctl', 'delete', uuid]);
 
+  @override
   Future<void> start() => Process.run('xcrun', ['simctl', 'boot', uuid]);
 
+  @override
   Future<void> stop() => Process.run('xcrun', ['simctl', 'shutdown', uuid]);
 
+  @override
   Future<void> wipe() => Process.run('xcrun', ['simctl', 'erase', uuid]);
 
   /// Parse a list of all available simulators. Unavailable run times and simulators with

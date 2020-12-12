@@ -3,6 +3,9 @@ library virtual_device;
 import 'dart:io';
 import 'dart:async';
 
+export 'package:virtual_device/src/android_emulator.dart';
+export 'package:virtual_device/src/ios_simulator.dart';
+
 enum OperatingSystem {
   iOS,
   android,

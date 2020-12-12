@@ -1,5 +1,3 @@
-import 'package:virtual_device/src/android_emulator.dart';
-import 'package:virtual_device/src/ios_simulator.dart';
 import 'package:virtual_device/virtual_device.dart';
 import 'package:args/args.dart';
 
@@ -105,24 +103,21 @@ void main(List<String> args) async {
       return await device.delete();
 
     case 'list':
-      if (results.command.command.name == 'devices') {
-        if (results.command['platform'] == 'ios') {
+      if (results.command['platform'] == 'ios') {
+        if (results.command.command.name == 'devices') {
           final devices = await IosSimulator.availableDevices();
           return print(devices.join('\n'));
         }
-      }
-      if (results.command.command.name == 'models') {
-        if (results.command['platform'] == 'ios') {
+        if (results.command.command.name == 'models') {
           final models = await IosSimulator.availableDeviceTypes();
           return print(models.keys.join('\n'));
         }
-      }
-      if (results.command.command.name == 'versions') {
-        if (results.command['platform'] == 'ios') {
+        if (results.command.command.name == 'versions') {
           final versions = await IosSimulator.availableRuntimes();
           return print(versions.keys.join('\n'));
         }
       }
+
       break;
 
     case 'start':

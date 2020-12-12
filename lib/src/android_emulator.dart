@@ -3,14 +3,19 @@ import 'dart:io';
 import 'package:virtual_device/virtual_device.dart';
 
 class AndroidEmulator implements VirtualDevice {
+  @override
   final String model;
 
+  @override
   final String name;
 
+  @override
   final os = OperatingSystem.android;
 
+  @override
   final String osVersion;
 
+  @override
   final String uuid;
 
   AndroidEmulator({
@@ -20,6 +25,7 @@ class AndroidEmulator implements VirtualDevice {
     this.uuid = '',
   });
 
+  @override
   Future<AndroidEmulator> create({bool verbose = false}) async {
     await VirtualDevice.runWithError('avdmanager', [
       if (verbose) '--verbose',
@@ -37,9 +43,11 @@ class AndroidEmulator implements VirtualDevice {
     return this;
   }
 
+  @override
   Future<void> delete() =>
       VirtualDevice.runWithError('emulator', ['delete', 'avd', '-n', name]);
 
+  @override
   Future<void> start({
     bool bootAnimation = false,
     bool snapshot = false,
@@ -53,9 +61,11 @@ class AndroidEmulator implements VirtualDevice {
         if (wipeData) '-wipe-data',
       ]);
 
+  @override
   Future<void> stop() =>
       VirtualDevice.runWithError('adb', ['-s', name, 'emu', 'kill']);
 
+  @override
   Future<void> wipe() =>
       VirtualDevice.runWithError('emulator', ['avd', name, '-wipe-data']);
 
