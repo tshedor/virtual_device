@@ -1,0 +1,13 @@
+name: virtual_device
+description: Manage/Create iOS simulators and Android emulators
+version: 0.0.1
+homepage: https://github.com/tshedor/virtual_device
+
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+
+dependencies:
+  args: any
+
+dev_dependencies:
+  test: ^1.14.3
