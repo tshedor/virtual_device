@@ -1,6 +1,6 @@
 name: virtual_device
-description: Manage/Create iOS simulators and Android emulators
-version: 0.0.1
+description: Manage and create iOS simulators and Android emulators
+version: 0.0.1+1
 homepage: https://github.com/tshedor/virtual_device
 
 environment:
