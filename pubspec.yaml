@@ -1,14 +1,18 @@
 name: virtual_device
-description: Manage and create iOS simulators and Android emulators
-version: 0.0.1+1
+description: Discover, run, stop, create, and destroy iOS simulators and Android emulators
+version: 0.0.2
 homepage: https://github.com/tshedor/virtual_device
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
 
+executables:
+  virtual_device:
+
 dependencies:
   args: ^1.6.0
   meta: ^1.2.4
+  uuid: ^2.2.2
 
 dev_dependencies:
   test: ^1.14.3

@@ -9,19 +9,19 @@ void main() async {
     os: OperatingSystem.iOS,
     osVersion: '14.2',
   );
-  final createdSimulator = await newSimulator.create();
-  await createdSimulator.start();
+  await newSimulator.createOrStart();
+  await newSimulator.start();
 
-// shutdown
-  await createdSimulator.stop();
+  // shutdown
+  await newSimulator.stop();
 
-// clean
-  await createdSimulator.wipe();
+  // clean
+  await newSimulator.wipe();
 
-// start again
-  await createdSimulator.start();
-  await createdSimulator.stop();
+  // start again
+  await newSimulator.start();
+  await newSimulator.stop();
 
-// destroy
-  await createdSimulator.delete();
+  // destroy
+  await newSimulator.delete();
 }
