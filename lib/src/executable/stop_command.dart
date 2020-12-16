@@ -1,4 +1,5 @@
 import 'package:args/command_runner.dart';
+import 'package:virtual_device/src/android/adb_cli.dart';
 import 'package:virtual_device/src/executable/executable_utils.dart';
 import 'package:virtual_device/src/executable/virtual_device_command.dart';
 import 'package:virtual_device/virtual_device.dart';
@@ -28,7 +29,7 @@ class StopCommand extends VirtualDeviceCommand {
   Future<void> run() async {
     if (argResults['all']) {
       if (isIos) return await IosSimulator.stopAll();
-      if (isAndroid) return await AndroidEmulator.stopAll();
+      if (isAndroid) return await AdbCli.instance.stopAll();
     }
 
     if (argResults['name'] == null) {

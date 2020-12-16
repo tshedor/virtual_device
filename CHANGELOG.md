@@ -1,5 +1,11 @@
 ## Unreleased
 
+## 0.0.3
+
+* Added `FlutterCli` to parse running simulators as reported by `flutter devices`
+* Added utils class `AdbCli` to abstract adb calls from `AndroidEmulator`
+* Moved `--platform` to be a global option for all commands instead of a subcommand-level option
+
 ## 0.0.2
 
 * Fix command line executable and improve help documentation

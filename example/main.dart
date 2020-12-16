@@ -10,7 +10,6 @@ void main() async {
     osVersion: '14.2',
   );
   await newSimulator.createOrStart();
-  await newSimulator.start();
 
   // shutdown
   await newSimulator.stop();

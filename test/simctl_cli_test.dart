@@ -36,8 +36,6 @@ void main() {
 
     test('.parseRuntimesOutput', () {
       final result = SimctlCli.parseRuntimesOutput(listRuntimesOutput);
-      print(result);
-      print(result.length);
       expect(result, hasLength(4));
       expect(result['iOS 8.4 (8.4 - 12H141)'],
           'com.apple.CoreSimulator.SimRuntime.iOS-8-4');

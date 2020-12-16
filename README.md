@@ -24,7 +24,7 @@ import 'package:virtual_device/virtual_device.dart';
 final simulators = await IosSimulator.availableDevices();
 await simulators.first.start();
 
-// Virtual device will increment your simulator names, so you don't need to
+// Virtual Device will increment your simulator names, so you don't need to
 // specify them. This would become `iPad Air 2:14.2:1`, but if it were run
 // again, the created device would be named `iPad Air 2:14.2:2`.
 final newSimulator = IosSimulator(

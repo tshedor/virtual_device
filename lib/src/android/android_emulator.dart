@@ -1,9 +1,21 @@
 import 'package:uuid/uuid.dart';
+import 'package:virtual_device/src/android/adb_cli.dart';
 import 'package:virtual_device/src/android/avdmanager_cli.dart';
 import 'package:virtual_device/src/virtual_device.dart';
 import 'package:virtual_device/virtual_device.dart';
 
 class AndroidEmulator extends VirtualDevice {
+  /// Discovers the emulator id if the emulator is running and assigns it
+  /// to [emulatorId].
+  Future<String> get asyncEmulatorId async {
+    if (emulatorId != null) return emulatorId;
+    final uuidAndEmulatorId = await AdbCli.instance.uuidAndEmulatorId;
+    if (uuidAndEmulatorId == null) return null;
+    return emulatorId = uuidAndEmulatorId[uuid];
+  }
+
+  String emulatorId;
+
   /// Whether to build an image with Google APIs. Defaults `true`
   final bool googleApis;
 
@@ -16,38 +28,15 @@ class AndroidEmulator extends VirtualDevice {
   @override
   final os = OperatingSystem.android;
 
+  /// Maps to the Android API Level
   @override
   final String osVersion;
-
-  Future<String> get emulatorId async {
-    final runningAdbEmulators =
-        await VirtualDevice.runWithError('adb', ['devices']);
-    final adbMatches = RegExp(r'^emulator-\d+', multiLine: true)
-        .allMatches(runningAdbEmulators);
-    if (adbMatches == null || adbMatches.isEmpty) return null;
-
-    // inspired by https://stackoverflow.com/a/42038655
-    final uuidAndEmulatorId = {};
-    for (final match in adbMatches) {
-      final emulatorId = match.group(0).trim();
-      final adbUuid = await VirtualDevice.runWithError('adb', [
-        '-s',
-        emulatorId,
-        'wait-for-device',
-        'shell',
-        'getprop',
-        'emu.uuid'
-      ]);
-      uuidAndEmulatorId[adbUuid.trim()] = emulatorId;
-    }
-
-    return uuidAndEmulatorId[uuid];
-  }
 
   @override
   final String uuid;
 
   AndroidEmulator({
+    this.emulatorId,
     this.googleApis = true,
     this.model,
     this.name,
@@ -77,7 +66,7 @@ class AndroidEmulator extends VirtualDevice {
         (await AvdmanagerCli.instance
             .generateName(model: model, osVersion: osVersion));
 
-    await VirtualDevice.runWithError('avdmanager', [
+    await runWithError('avdmanager', [
       if (verbose) '--verbose',
       'create',
       'avd',
@@ -107,7 +96,7 @@ class AndroidEmulator extends VirtualDevice {
 
   @override
   Future<void> delete() =>
-      VirtualDevice.runWithError('emulator', ['delete', 'avd', '-n', name]);
+      runWithError('emulator', ['delete', 'avd', '-n', name]);
 
   @override
   Future<void> start({
@@ -115,7 +104,7 @@ class AndroidEmulator extends VirtualDevice {
     bool snapshot = false,
     bool wipeData = true,
   }) =>
-      VirtualDevice.runWithError('emulator', [
+      runWithError('emulator', [
         '-avd',
         name,
         if (!bootAnimation) '-no-boot-anim',
@@ -129,17 +118,13 @@ class AndroidEmulator extends VirtualDevice {
       ]);
 
   @override
-  Future<void> stop() async => await VirtualDevice.runWithError('adb', [
-        '-s',
-        (await emulatorId),
-        'wait-for-device',
-        'emu',
-        'kill',
-      ]);
+  Future<void> stop() async {
+    final _emulatorId = await asyncEmulatorId;
+    return AdbCli.instance.stop(_emulatorId);
+  }
 
   @override
-  Future<void> wipe() =>
-      VirtualDevice.runWithError('emulator', ['avd', name, '-wipe-data']);
+  Future<void> wipe() => runWithError('emulator', ['avd', name, '-wipe-data']);
 
   /// Created and available emulators
   static Future<List<AndroidEmulator>> availableDevices() async {
@@ -164,7 +149,4 @@ class AndroidEmulator extends VirtualDevice {
   /// Segment available Android versions into digestible Maps. See [AvdmanagerCli#availableRuntimes]
   static Future<Iterable<Map<String, String>>> availableRuntimes() =>
       AvdmanagerCli.instance.availableRuntimes();
-
-  static Future<void> stopAll() =>
-      VirtualDevice.runWithError('adb', ['emu', 'kill']);
 }

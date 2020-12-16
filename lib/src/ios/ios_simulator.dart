@@ -49,15 +49,14 @@ class IosSimulator extends VirtualDevice {
     final deviceName = name ??
         (await SimctlCli.instance
             .generateName(model: model, osVersion: osVersion));
-    uuid = await VirtualDevice.runWithError(
+    uuid = await runWithError(
         'xcrun', ['simctl', 'create', deviceName, deviceType, runtime]);
   }
 
   @override
   Future<void> createOrStart() async {
     if (uuid != null) {
-      return await VirtualDevice.runWithError(
-          'xcrun', ['simctl', 'boot', uuid]);
+      return await runWithError('xcrun', ['simctl', 'boot', uuid]);
     }
 
     final devices = await availableDevices();
@@ -77,20 +76,16 @@ class IosSimulator extends VirtualDevice {
   }
 
   @override
-  Future<void> delete() =>
-      VirtualDevice.runWithError('xcrun', ['simctl', 'delete', uuid]);
+  Future<void> delete() => runWithError('xcrun', ['simctl', 'delete', uuid]);
 
   @override
-  Future<void> start() =>
-      VirtualDevice.runWithError('xcrun', ['simctl', 'boot', uuid]);
+  Future<void> start() => runWithError('xcrun', ['simctl', 'boot', uuid]);
 
   @override
-  Future<void> stop() =>
-      VirtualDevice.runWithError('xcrun', ['simctl', 'shutdown', uuid]);
+  Future<void> stop() => runWithError('xcrun', ['simctl', 'shutdown', uuid]);
 
   @override
-  Future<void> wipe() =>
-      VirtualDevice.runWithError('xcrun', ['simctl', 'erase', uuid]);
+  Future<void> wipe() => runWithError('xcrun', ['simctl', 'erase', uuid]);
 
   /// Created and available simulators
   static Future<List<IosSimulator>> availableDevices() async {
@@ -119,9 +114,9 @@ class IosSimulator extends VirtualDevice {
       SimctlCli.instance.availableRuntimes();
 
   static Future<void> stopAll() =>
-      VirtualDevice.runWithError('xcrun', ['simctl', 'shutdown', 'all']);
+      runWithError('xcrun', ['simctl', 'shutdown', 'all']);
 
   /// Wipe data from all simulators
   static Future<void> wipeAll() =>
-      VirtualDevice.runWithError('xcrun', ['simctl', 'erase', 'all']);
+      runWithError('xcrun', ['simctl', 'erase', 'all']);
 }

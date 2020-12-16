@@ -4,28 +4,28 @@ import 'package:virtual_device/src/virtual_device.dart';
 
 /// A helper class to parse commandline output from `simctl`
 class SimctlCli extends CliAdapter {
-  const SimctlCli._();
-
   static const SimctlCli instance = SimctlCli._();
+
+  const SimctlCli._();
 
   @override
   Future<Iterable<Map<String, dynamic>>> availableDevices() async {
-    final cliOutput = await VirtualDevice.runWithError(
-        'xcrun', ['simctl', 'list', 'devices']);
+    final cliOutput =
+        await runWithError('xcrun', ['simctl', 'list', 'devices']);
     return parseDevicesOutput(cliOutput);
   }
 
   /// Segment available devices by `humanizedDeviceName: deviceTypeId`
   Future<Map<String, String>> availableDeviceTypes() async {
-    final cliOutput = await VirtualDevice.runWithError(
-        'xcrun', ['simctl', 'list', 'devicetypes']);
+    final cliOutput =
+        await runWithError('xcrun', ['simctl', 'list', 'devicetypes']);
     return parseDeviceTypesOutput(cliOutput);
   }
 
   /// Segment available OS versions by `verionNumber: runtimeId`
   Future<Map<String, String>> availableRuntimes() async {
-    final cliOutput = await VirtualDevice.runWithError(
-        'xcrun', ['simctl', 'list', 'runtimes']);
+    final cliOutput =
+        await runWithError('xcrun', ['simctl', 'list', 'runtimes']);
     return parseRuntimesOutput(cliOutput);
   }
 
@@ -39,19 +39,19 @@ class SimctlCli extends CliAdapter {
 
     return matches
         .map((match) {
+          final runtimeHeader = match.group(1);
           // Ignore unavailable simulators
-          if (match.group(1).contains('Unavailable')) return null;
+          if (runtimeHeader.contains('Unavailable')) return null;
 
           final runtimeString =
-              match.group(1).replaceAll(RegExp(r'[\d\.\s\-]*'), '').trim();
+              runtimeHeader.replaceAll(RegExp(r'[\d\.\s\-]*'), '').trim();
           final osVersion =
-              match.group(1).replaceAll(RegExp(r'[^\d\.]*'), '').trim();
+              runtimeHeader.replaceAll(RegExp(r'[^\d\.]*'), '').trim();
           final runtime = OperatingSystem.values
               .firstWhere((e) => e.toString().split('.').last == runtimeString);
           final devices = _simulatorsFromSimctl(cliOutput, match, matches)
               .replaceAll(RegExp(r'^ --', multiLine: true), '')
               .replaceAll(RegExp(r'-- $', multiLine: true), '')
-              .replaceAll(RegExp('^\s*', multiLine: true), '')
               .trim()
               .split('\n');
 

@@ -3,26 +3,23 @@ import 'package:virtual_device/src/cli_adapter.dart';
 import 'package:virtual_device/src/virtual_device.dart';
 
 class AvdmanagerCli extends CliAdapter {
-  const AvdmanagerCli._();
-
   static const AvdmanagerCli instance = AvdmanagerCli._();
+
+  const AvdmanagerCli._();
 
   @override
   Future<Iterable<Map<String, dynamic>>> availableDevices() async {
-    final cliOutput =
-        await VirtualDevice.runWithError('avdmanager', ['list', 'avd']);
+    final cliOutput = await runWithError('avdmanager', ['list', 'avd']);
     return parseDevicesOutput(cliOutput);
   }
 
   Future<Iterable<Map<String, dynamic>>> availableDeviceTypes() async {
-    final cliOutput =
-        await VirtualDevice.runWithError('avdmanager', ['list', 'device']);
+    final cliOutput = await runWithError('avdmanager', ['list', 'device']);
     return parseDeviceTypesOutput(cliOutput);
   }
 
   Future<Iterable<Map<String, dynamic>>> availableRuntimes() async {
-    final cliOutput =
-        await VirtualDevice.runWithError('avdmanager', ['list', 'target']);
+    final cliOutput = await runWithError('avdmanager', ['list', 'target']);
     return parseRuntimesOutput(cliOutput);
   }
 

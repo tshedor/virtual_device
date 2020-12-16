@@ -49,16 +49,16 @@ abstract class VirtualDevice {
 
   /// Remove all data from the device. To permanently remove the device, see [delete].
   Future<void> wipe();
+}
 
-  /// If the command line execution returns an exception, throw it in Dart.
-  static Future<String> runWithError(String cmd, List<String> args) async {
-    final processOutput = await Process.run(cmd, args);
+/// If the command line execution returns an exception, throw it in Dart.
+Future<String> runWithError(String cmd, List<String> args) async {
+  final processOutput = await Process.run(cmd, args);
 
-    if (processOutput.stderr != null &&
-        processOutput.stderr.toString().isNotEmpty) {
-      throw StateError(processOutput.stderr);
-    }
-
-    return processOutput.stdout;
+  if (processOutput.stderr != null &&
+      processOutput.stderr.toString().isNotEmpty) {
+    throw StateError(processOutput.stderr);
   }
+
+  return processOutput.stdout;
 }
