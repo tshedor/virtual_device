@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.0.3+1
+
+* Expose `FlutterCli` in `virtual_device.dart`
+
 ## 0.0.3
 
 * Added `FlutterCli` to parse running simulators as reported by `flutter devices`

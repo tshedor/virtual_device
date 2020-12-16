@@ -36,10 +36,12 @@ void main() {
 
     test('.parseRuntimesOutput', () {
       final result = SimctlCli.parseRuntimesOutput(listRuntimesOutput);
-      expect(result, hasLength(4));
-      expect(result['iOS 8.4 (8.4 - 12H141)'],
-          'com.apple.CoreSimulator.SimRuntime.iOS-8-4');
-      expect(result['watchOS 5.1 (5.1 - 16R591)'],
+      print(result);
+      expect(result, hasLength(3));
+      expect(result['iOS'], hasLength(2));
+      expect(
+          result['iOS']['8.4'], 'com.apple.CoreSimulator.SimRuntime.iOS-8-4');
+      expect(result['watchOS']['5.1'],
           'com.apple.CoreSimulator.SimRuntime.watchOS-5-1');
     });
   });

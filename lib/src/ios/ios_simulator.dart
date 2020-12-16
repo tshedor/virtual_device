@@ -41,11 +41,15 @@ class IosSimulator extends VirtualDevice {
     }
 
     final runtimes = await SimctlCli.instance.availableRuntimes();
-    final runtimeKey = runtimes.keys.firstWhere(
-        (k) => k.startsWith('${os.toString().split(".").last} $osVersion'),
+    final runtimesForOs = runtimes[os.toString().split('.').last];
+    if (runtimesForOs?.isEmpty ?? true) {
+      throw StateError('No runtimes available for $osVersion');
+    }
+
+    final runtimeKey = runtimesForOs.keys.firstWhere((e) => e == osVersion,
         orElse: () => throw StateError(
-            '$osVersion is not available from ${runtimes.keys.join(", ")}'));
-    final runtime = runtimes[runtimeKey];
+            '$osVersion is not available from ${runtimesForOs.keys.join(", ")}'));
+    final runtime = runtimesForOs[runtimeKey];
     final deviceName = name ??
         (await SimctlCli.instance
             .generateName(model: model, osVersion: osVersion));
@@ -110,7 +114,7 @@ class IosSimulator extends VirtualDevice {
       SimctlCli.instance.availableDeviceTypes();
 
   /// Segment available OS versions by `verionNumber: runtimeId`. See [SimctlCli#availableRuntimes]
-  static Future<Map<String, String>> availableRuntimes() =>
+  static Future<Map<String, Map<String, String>>> availableRuntimes() =>
       SimctlCli.instance.availableRuntimes();
 
   static Future<void> stopAll() =>

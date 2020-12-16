@@ -23,7 +23,7 @@ class SimctlCli extends CliAdapter {
   }
 
   /// Segment available OS versions by `verionNumber: runtimeId`
-  Future<Map<String, String>> availableRuntimes() async {
+  Future<Map<String, Map<String, String>>> availableRuntimes() async {
     final cliOutput =
         await runWithError('xcrun', ['simctl', 'list', 'runtimes']);
     return parseRuntimesOutput(cliOutput);
@@ -80,11 +80,14 @@ class SimctlCli extends CliAdapter {
 
   /// Extracted for testing from [availableRuntimes]
   @visibleForTesting
-  static Map<String, String> parseRuntimesOutput(String cliOutput) {
-    final matches =
-        RegExp(r'(.*) - (.*)$', multiLine: true).allMatches(cliOutput.trim());
-    return matches.fold<Map<String, String>>({}, (acc, match) {
-      acc[match.group(1).trim()] = match.group(2).trim();
+  static Map<String, Map<String, String>> parseRuntimesOutput(
+      String cliOutput) {
+    final runtimesOnly = cliOutput.replaceAll('== Runtimes ==', '').trim();
+    final matches = RegExp(r'^([^\d]+) ([\d\.]+) .* (com.*)$', multiLine: true)
+        .allMatches(runtimesOnly);
+    return matches.fold<Map<String, Map<String, String>>>({}, (acc, match) {
+      acc[match.group(1).trim()] ??= {};
+      acc[match.group(1).trim()][match.group(2).trim()] = match.group(3).trim();
       return acc;
     });
   }
