@@ -6,37 +6,36 @@ void main() {
   group('SimctlCli', () {
     test('.parseDevicesOutput', () {
       final result = SimctlCli.parseDevicesOutput(listDevices);
-      expect(result, hasLength(9));
+      expect(result, hasLength(5));
       expect(result.first, {
-        'model': 'iPad Retina',
-        'name': 'iPad Retina',
+        'model': 'iPhone 5s',
+        'name': 'iPhone 5s',
         'os': OperatingSystem.iOS,
-        'osVersion': '8.4',
+        'osVersion': '12.1',
         'status': 'Shutdown',
-        'uuid': 'A1283403-6CBC-43EA-A69A-2FA1167337DC'
+        'uuid': '09F9F55E-D9ED-4FA5-9F13-67BB8874A3FE'
       });
       expect(result.last, {
-        'model': 'Apple Watch Series 2 - 42mm',
-        'name': 'Apple Watch Series 2 - 42mm',
-        'os': OperatingSystem.watchOS,
-        'osVersion': '5.1',
+        'model': 'Apple TV 4K (at 1080p)',
+        'name': 'Apple TV 4K (at 1080p)',
+        'os': OperatingSystem.tvOS,
+        'osVersion': '12.1',
         'status': 'Shutdown',
-        'uuid': '77943022-94F7-4E7D-9406-1CA874D82F55'
+        'uuid': '466B9432-32F2-444F-8BB3-AF022C7A071F'
       });
     });
 
     test('.parseDeviceTypesOutput', () {
       final result = SimctlCli.parseDeviceTypesOutput(listDeviceTypes);
-      expect(result, hasLength(39));
-      expect(result['iPad Prod (12.9-inch) (3rd generation)'],
-          'com.apple.CoreSimulator.SimDeviceType.iPad-Pro--12-9-inch---3rd-generation-');
+      expect(result, hasLength(9));
+      expect(result['iPad Pro (9.7-inch)'],
+          'com.apple.CoreSimulator.SimDeviceType.iPad-Pro--9-7-inch-');
       expect(result['Apple Watch - 42mm'],
           'com.apple.CoreSimulator.SimDeviceType.Apple-Watch-42mm');
     });
 
     test('.parseRuntimesOutput', () {
       final result = SimctlCli.parseRuntimesOutput(listRuntimesOutput);
-      print(result);
       expect(result, hasLength(3));
       expect(result['iOS'], hasLength(2));
       expect(
@@ -47,74 +46,187 @@ void main() {
   });
 }
 
-const listRuntimesOutput = '''== Runtimes ==
-iOS 8.4 (8.4 - 12H141) - com.apple.CoreSimulator.SimRuntime.iOS-8-4
-iOS 12.1 (12.1 - 16B91) - com.apple.CoreSimulator.SimRuntime.iOS-12-1
-tvOS 12.1 (12.1 - 16J602) - com.apple.CoreSimulator.SimRuntime.tvOS-12-1
-watchOS 5.1 (5.1 - 16R591) - com.apple.CoreSimulator.SimRuntime.watchOS-5-1
+const listRuntimesOutput = '''{
+  "runtimes" : [
+    {
+      "bundlePath" : "\/Library\/Developer\/CoreSimulator\/Profiles\/Runtimes\/iOS 8.4.simruntime",
+      "availabilityError" : "",
+      "buildversion" : "12H141",
+      "availability" : "(available)",
+      "isAvailable" : true,
+      "identifier" : "com.apple.CoreSimulator.SimRuntime.iOS-8-4",
+      "version" : "8.4",
+      "name" : "iOS 8.4"
+    },
+    {
+      "bundlePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/Library\/CoreSimulator\/Profiles\/Runtimes\/iOS.simruntime",
+      "availabilityError" : "",
+      "buildversion" : "16B91",
+      "availability" : "(available)",
+      "isAvailable" : true,
+      "identifier" : "com.apple.CoreSimulator.SimRuntime.iOS-12-1",
+      "version" : "12.1",
+      "name" : "iOS 12.1"
+    },
+    {
+      "bundlePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/AppleTVOS.platform\/Developer\/Library\/CoreSimulator\/Profiles\/Runtimes\/tvOS.simruntime",
+      "availabilityError" : "",
+      "buildversion" : "16J602",
+      "availability" : "(available)",
+      "isAvailable" : true,
+      "identifier" : "com.apple.CoreSimulator.SimRuntime.tvOS-12-1",
+      "version" : "12.1",
+      "name" : "tvOS 12.1"
+    },
+    {
+      "bundlePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/WatchOS.platform\/Developer\/Library\/CoreSimulator\/Profiles\/Runtimes\/watchOS.simruntime",
+      "availabilityError" : "",
+      "buildversion" : "16R591",
+      "availability" : "(available)",
+      "isAvailable" : true,
+      "identifier" : "com.apple.CoreSimulator.SimRuntime.watchOS-5-1",
+      "version" : "5.1",
+      "name" : "watchOS 5.1"
+    }
+  ]
+}
 ''';
 
-const listDeviceTypes = '''== Device Types ==
-iPhone 4s (com.apple.CoreSimulator.SimDeviceType.iPhone-4s)
-iPhone 5 (com.apple.CoreSimulator.SimDeviceType.iPhone-5)
-iPhone 5s (com.apple.CoreSimulator.SimDeviceType.iPhone-5s)
-iPhone 6 (com.apple.CoreSimulator.SimDeviceType.iPhone-6)
-iPhone 6 Plus (com.apple.CoreSimulator.SimDeviceType.iPhone-6-Plus)
-iPhone 6s (com.apple.CoreSimulator.SimDeviceType.iPhone-6s)
-iPhone 6s Plus (com.apple.CoreSimulator.SimDeviceType.iPhone-6s-Plus)
-iPhone 7 (com.apple.CoreSimulator.SimDeviceType.iPhone-7)
-iPhone 7 Plus (com.apple.CoreSimulator.SimDeviceType.iPhone-7-Plus)
-iPhone 8 (com.apple.CoreSimulator.SimDeviceType.iPhone-8)
-iPhone 8 Plus (com.apple.CoreSimulator.SimDeviceType.iPhone-8-Plus)
-iPhone SE (com.apple.CoreSimulator.SimDeviceType.iPhone-SE)
-iPhone X (com.apple.CoreSimulator.SimDeviceType.iPhone-X)
-iPhone Xs (com.apple.CoreSimulator.SimDeviceType.iPhone-XS)
-iPhone Xs Max (com.apple.CoreSimulator.SimDeviceType.iPhone-XS-Max)
-iPhone Xʀ (com.apple.CoreSimulator.SimDeviceType.iPhone-XR)
-iPad 2 (com.apple.CoreSimulator.SimDeviceType.iPad-2)
-iPad Retina (com.apple.CoreSimulator.SimDeviceType.iPad-Retina)
-iPad Air (com.apple.CoreSimulator.SimDeviceType.iPad-Air)
-iPad Air 2 (com.apple.CoreSimulator.SimDeviceType.iPad-Air-2)
-iPad (5th generation) (com.apple.CoreSimulator.SimDeviceType.iPad--5th-generation-)
-iPad Pro (9.7-inch) (com.apple.CoreSimulator.SimDeviceType.iPad-Pro--9-7-inch-)
-iPad Pro (12.9-inch) (com.apple.CoreSimulator.SimDeviceType.iPad-Pro)
-iPad Pro (12.9-inch) (2nd generation) (com.apple.CoreSimulator.SimDeviceType.iPad-Pro--12-9-inch---2nd-generation-)
-iPad Pro (10.5-inch) (com.apple.CoreSimulator.SimDeviceType.iPad-Pro--10-5-inch-)
-iPad (6th generation) (com.apple.CoreSimulator.SimDeviceType.iPad--6th-generation-)
-iPad Pro (11-inch) (com.apple.CoreSimulator.SimDeviceType.iPad-Pro--11-inch-)
-iPad Pro (12.9-inch) (3rd generation) (com.apple.CoreSimulator.SimDeviceType.iPad-Pro--12-9-inch---3rd-generation-)
-Apple TV (com.apple.CoreSimulator.SimDeviceType.Apple-TV-1080p)
-Apple TV 4K (com.apple.CoreSimulator.SimDeviceType.Apple-TV-4K-4K)
-Apple TV 4K (at 1080p) (com.apple.CoreSimulator.SimDeviceType.Apple-TV-4K-1080p)
-Apple Watch - 38mm (com.apple.CoreSimulator.SimDeviceType.Apple-Watch-38mm)
-Apple Watch - 42mm (com.apple.CoreSimulator.SimDeviceType.Apple-Watch-42mm)
-Apple Watch Series 2 - 38mm (com.apple.CoreSimulator.SimDeviceType.Apple-Watch-Series-2-38mm)
-Apple Watch Series 2 - 42mm (com.apple.CoreSimulator.SimDeviceType.Apple-Watch-Series-2-42mm)
-Apple Watch Series 3 - 38mm (com.apple.CoreSimulator.SimDeviceType.Apple-Watch-Series-3-38mm)
-Apple Watch Series 3 - 42mm (com.apple.CoreSimulator.SimDeviceType.Apple-Watch-Series-3-42mm)
-Apple Watch Series 4 - 40mm (com.apple.CoreSimulator.SimDeviceType.Apple-Watch-Series-4-40mm)
-Apple Watch Series 4 - 44mm (com.apple.CoreSimulator.SimDeviceType.Apple-Watch-Series-4-44mm)
+const listDeviceTypes = '''{
+  "devicetypes" : [
+    {
+      "name" : "iPhone 4s",
+      "bundlePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/Library\/CoreSimulator\/Profiles\/DeviceTypes\/iPhone 4s.simdevicetype",
+      "identifier" : "com.apple.CoreSimulator.SimDeviceType.iPhone-4s"
+    },
+    {
+      "name" : "iPhone 5",
+      "bundlePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/Library\/CoreSimulator\/Profiles\/DeviceTypes\/iPhone 5.simdevicetype",
+      "identifier" : "com.apple.CoreSimulator.SimDeviceType.iPhone-5"
+    },
+    {
+      "name" : "iPad (5th generation)",
+      "bundlePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/Library\/CoreSimulator\/Profiles\/DeviceTypes\/iPad (5th generation).simdevicetype",
+      "identifier" : "com.apple.CoreSimulator.SimDeviceType.iPad--5th-generation-"
+    },
+    {
+      "name" : "iPad Pro (9.7-inch)",
+      "bundlePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/Library\/CoreSimulator\/Profiles\/DeviceTypes\/iPad Pro (9.7-inch).simdevicetype",
+      "identifier" : "com.apple.CoreSimulator.SimDeviceType.iPad-Pro--9-7-inch-"
+    },
+    {
+      "name" : "Apple TV",
+      "bundlePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/AppleTVOS.platform\/Developer\/Library\/CoreSimulator\/Profiles\/DeviceTypes\/Apple TV.simdevicetype",
+      "identifier" : "com.apple.CoreSimulator.SimDeviceType.Apple-TV-1080p"
+    },
+    {
+      "name" : "Apple TV 4K",
+      "bundlePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/AppleTVOS.platform\/Developer\/Library\/CoreSimulator\/Profiles\/DeviceTypes\/Apple TV 4K.simdevicetype",
+      "identifier" : "com.apple.CoreSimulator.SimDeviceType.Apple-TV-4K-4K"
+    },
+    {
+      "name" : "Apple TV 4K (at 1080p)",
+      "bundlePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/AppleTVOS.platform\/Developer\/Library\/CoreSimulator\/Profiles\/DeviceTypes\/Apple TV 4K (at 1080p).simdevicetype",
+      "identifier" : "com.apple.CoreSimulator.SimDeviceType.Apple-TV-4K-1080p"
+    },
+    {
+      "name" : "Apple Watch - 38mm",
+      "bundlePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/WatchOS.platform\/Developer\/Library\/CoreSimulator\/Profiles\/DeviceTypes\/Apple Watch - 38mm.simdevicetype",
+      "identifier" : "com.apple.CoreSimulator.SimDeviceType.Apple-Watch-38mm"
+    },
+    {
+      "name" : "Apple Watch - 42mm",
+      "bundlePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/WatchOS.platform\/Developer\/Library\/CoreSimulator\/Profiles\/DeviceTypes\/Apple Watch - 42mm.simdevicetype",
+      "identifier" : "com.apple.CoreSimulator.SimDeviceType.Apple-Watch-42mm"
+    }
+  ]
+}
 ''';
 
-const listDevices = '''== Devices ==
--- iOS 8.4 --
-    iPad Retina (A1283403-6CBC-43EA-A69A-2FA1167337DC) (Shutdown)
-    Resizable iPad (2E8CAD70-8830-4D4A-9FA5-40F8AAFC0B16) (Shutdown) (unavailable, device type profile not found)
--- iOS 12.1 --
-    iPhone 5s (09F9F55E-D9ED-4FA5-9F13-67BB8874A3FE) (Shutdown)
-    iPad Pro (10.5-inch) (937AAB50-D28E-4721-A584-635A929E4DFD) (Shutdown)
-    iPad (6th generation) (F62706D4-FE76-495C-A112-23672A2F1687) (Shutdown)
-    iPad Pro (12.9-inch) (3rd generation) (FA5BCAA6-D179-43AD-BD8B-94E729E42ADC) (Shutdown)
-    iPad Air 2:12.1:1 (FA5BCAA6-D179-43AD-BD8B-94E729E42ADC) (Shutdown)
--- tvOS 12.1 --
-    Apple TV (0154B31D-41E9-40A0-85C9-9A9E72FC136A) (Shutdown)
-    Apple TV 4K (at 1080p) (466B9432-32F2-444F-8BB3-AF022C7A071F) (Shutdown)
--- watchOS 5.1 --
-    Apple Watch Series 2 - 42mm (77943022-94F7-4E7D-9406-1CA874D82F55) (Shutdown)
--- Unavailable: com.apple.CoreSimulator.SimRuntime.iOS-10-3 --
-    iPad Air 2 (F702DE98-6759-4A48-A581-B9B139F2D098) (Shutdown) (unavailable, runtime profile not found)
-    iPad (5th generation) (4ABC5E70-6707-48B4-A24B-E90FD19DC08C) (Shutdown) (unavailable, runtime profile not found)
-    iPad Pro (9.7 inch) (61CAD829-6914-4579-8528-EEFE76DC5611) (Shutdown) (unavailable, runtime profile not found)
-    iPad Pro (12.9-inch) (2nd generation) (BD8BCD43-306E-45D5-8163-1CC6BF989BCD) (Shutdown) (unavailable, runtime profile not found)
-    iPad Pro (10.5-inch) (AD16D4B6-0A52-4E5D-95F4-0AE92982A568) (Shutdown) (unavailable, runtime profile not found)
+const listDevices = '''{
+  "devices" : {
+    "com.apple.CoreSimulator.SimRuntime.iOS-12-0" : [
+      {
+        "availability" : "(unavailable, runtime profile not found)",
+        "state" : "Shutdown",
+        "isAvailable" : false,
+        "name" : "iPhone 5s",
+        "udid" : "3ACF3FA8-CA90-490E-B177-6C96827B26AB",
+        "availabilityError" : "runtime profile not found"
+      }
+    ],
+    "iOS 12.1" : [
+      {
+        "availability" : "(available)",
+        "state" : "Shutdown",
+        "isAvailable" : true,
+        "name" : "iPhone 5s",
+        "udid" : "09F9F55E-D9ED-4FA5-9F13-67BB8874A3FE",
+        "availabilityError" : ""
+      },
+      {
+        "availability" : "(available)",
+        "state" : "Shutdown",
+        "isAvailable" : true,
+        "name" : "iPhone 6",
+        "udid" : "25130F1E-E829-413E-A57F-C5FB000BF812",
+        "availabilityError" : ""
+      }
+    ],
+    "com.apple.CoreSimulator.SimRuntime.tvOS-9-2" : [
+      {
+        "availability" : "(unavailable, runtime profile not found)",
+        "state" : "Shutdown",
+        "isAvailable" : false,
+        "name" : "Apple TV 1080p",
+        "udid" : "B7EBA2D0-6220-4519-BE03-EF6ED88FE4C1",
+        "availabilityError" : "runtime profile not found"
+      }
+    ],
+    "tvOS 12.1" : [
+      {
+        "availability" : "(available)",
+        "state" : "Shutdown",
+        "isAvailable" : true,
+        "name" : "Apple TV",
+        "udid" : "0154B31D-41E9-40A0-85C9-9A9E72FC136A",
+        "availabilityError" : ""
+      },
+      {
+        "availability" : "(available)",
+        "state" : "Shutdown",
+        "isAvailable" : true,
+        "name" : "Apple TV 4K",
+        "udid" : "0A721045-1FC7-447A-8201-B337FC0A7BBA",
+        "availabilityError" : ""
+      },
+      {
+        "availability" : "(available)",
+        "state" : "Shutdown",
+        "isAvailable" : true,
+        "name" : "Apple TV 4K (at 1080p)",
+        "udid" : "466B9432-32F2-444F-8BB3-AF022C7A071F",
+        "availabilityError" : ""
+      }
+    ],
+    "com.apple.CoreSimulator.SimRuntime.iOS-9-2" : [
+      {
+        "availability" : "(unavailable, runtime profile not found)",
+        "state" : "Shutdown",
+        "isAvailable" : false,
+        "name" : "iPhone 4s",
+        "udid" : "30AEBD15-2864-4852-BEA1-E535B7BD9254",
+        "availabilityError" : "runtime profile not found"
+      },
+      {
+        "availability" : "(unavailable, runtime profile not found)",
+        "state" : "Shutdown",
+        "isAvailable" : false,
+        "name" : "iPhone 5",
+        "udid" : "F7AC90A6-C50D-4188-A14E-06555CC611A4",
+        "availabilityError" : "runtime profile not found"
+      }
+    ]
+  }
+}
 ''';

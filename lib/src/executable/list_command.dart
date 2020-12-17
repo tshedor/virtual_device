@@ -70,7 +70,10 @@ class _Versions extends VirtualDeviceCommand {
   Future<void> run() async {
     if (isIos) {
       final versions = await IosSimulator.availableRuntimes();
-      return print(versions.keys.join('\n'));
+      final output = versions.entries.map((entry) {
+        return '${entry.key}: ${entry.value.keys.join(", ")}';
+      });
+      return print(output.join('\n'));
     }
 
     if (isAndroid) {

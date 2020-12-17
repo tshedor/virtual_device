@@ -1,8 +1,12 @@
 ## Unreleased
 
+* Format new availableRuntimes output
+* Parse simctl with JSON
+
 ## 0.0.3+1
 
 * Expose `FlutterCli` in `virtual_device.dart`
+* Revise `IosSimulator.availableRuntimes` to return a nested map: `{ os: {osVersion: runtime} }`
 
 ## 0.0.3
 

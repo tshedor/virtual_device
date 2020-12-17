@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:meta/meta.dart';
 import 'package:virtual_device/src/cli_adapter.dart';
 import 'package:virtual_device/src/virtual_device.dart';
@@ -11,69 +13,62 @@ class SimctlCli extends CliAdapter {
   @override
   Future<Iterable<Map<String, dynamic>>> availableDevices() async {
     final cliOutput =
-        await runWithError('xcrun', ['simctl', 'list', 'devices']);
+        await runWithError('xcrun', ['simctl', 'list', '--json', 'devices']);
     return parseDevicesOutput(cliOutput);
   }
 
   /// Segment available devices by `humanizedDeviceName: deviceTypeId`
   Future<Map<String, String>> availableDeviceTypes() async {
-    final cliOutput =
-        await runWithError('xcrun', ['simctl', 'list', 'devicetypes']);
+    final cliOutput = await runWithError(
+        'xcrun', ['simctl', 'list', '--json', 'devicetypes']);
     return parseDeviceTypesOutput(cliOutput);
   }
 
   /// Segment available OS versions by `verionNumber: runtimeId`
   Future<Map<String, Map<String, String>>> availableRuntimes() async {
     final cliOutput =
-        await runWithError('xcrun', ['simctl', 'list', 'runtimes']);
+        await runWithError('xcrun', ['simctl', 'list', '--json', 'runtimes']);
     return parseRuntimesOutput(cliOutput);
   }
 
   /// Extracted for testing from [availableDevices]
   @visibleForTesting
   static Iterable<Map<String, dynamic>> parseDevicesOutput(String cliOutput) {
-    final matches = RegExp(r'^-- (.*) --$', multiLine: true)
-        .allMatches(cliOutput)
-        .toList()
-        .cast<RegExpMatch>();
+    final Map asJson = jsonDecode(cliOutput)['devices'];
+    return asJson.entries
+        .map((entry) {
+          final os = OperatingSystem.values.firstWhere(
+              (o) =>
+                  o.toString().split('.').last ==
+                  entry.key.replaceAll(RegExp(r'[\s\.\d]+'), ''),
+              orElse: () => null);
+          if (os == null) return null;
 
-    return matches
-        .map((match) {
-          final runtimeHeader = match.group(1);
-          // Ignore unavailable simulators
-          if (runtimeHeader.contains('Unavailable')) return null;
+          return entry.value.map((device) {
+            if (!device['isAvailable']) return null;
 
-          final runtimeString =
-              runtimeHeader.replaceAll(RegExp(r'[\d\.\s\-]*'), '').trim();
-          final osVersion =
-              runtimeHeader.replaceAll(RegExp(r'[^\d\.]*'), '').trim();
-          final runtime = OperatingSystem.values
-              .firstWhere((e) => e.toString().split('.').last == runtimeString);
-          final devices = _simulatorsFromSimctl(cliOutput, match, matches)
-              .replaceAll(RegExp(r'^ --', multiLine: true), '')
-              .replaceAll(RegExp(r'-- $', multiLine: true), '')
-              .trim()
-              .split('\n');
-
-          return devices.map((device) {
-            return _deviceFromString(
-              device,
-              runtime: runtime,
-              osVersion: osVersion,
-            );
+            return {
+              'model': device['name'].replaceAll(RegExp(r':[\d\.]*'), ''),
+              'name': device['name'],
+              'os': os,
+              'osVersion': entry.key.replaceAll(RegExp(r'[^\d\.]+'), ''),
+              'status': device['state'],
+              'uuid': device['udid'],
+            };
           }).where((e) => e != null);
         })
         .where((e) => e != null)
-        .expand((e) => e);
+        .expand((e) => e)
+        .toList()
+        .cast<Map<String, dynamic>>();
   }
 
   /// Extracted for testing from [availableDeviceTypes]
   @visibleForTesting
   static Map<String, String> parseDeviceTypesOutput(String cliOutput) {
-    final matches =
-        RegExp(r'(.*)\(([^\s]+)\)$', multiLine: true).allMatches(cliOutput);
-    return matches.fold<Map<String, String>>({}, (acc, match) {
-      acc[match.group(1).trim()] = match.group(2).trim();
+    final Iterable asJson = jsonDecode(cliOutput)['devicetypes'];
+    return asJson.fold<Map<String, String>>({}, (acc, deviceType) {
+      acc[deviceType['name']] = deviceType['identifier'];
       return acc;
     });
   }
@@ -82,52 +77,12 @@ class SimctlCli extends CliAdapter {
   @visibleForTesting
   static Map<String, Map<String, String>> parseRuntimesOutput(
       String cliOutput) {
-    final runtimesOnly = cliOutput.replaceAll('== Runtimes ==', '').trim();
-    final matches = RegExp(r'^([^\d]+) ([\d\.]+) .* (com.*)$', multiLine: true)
-        .allMatches(runtimesOnly);
-    return matches.fold<Map<String, Map<String, String>>>({}, (acc, match) {
-      acc[match.group(1).trim()] ??= {};
-      acc[match.group(1).trim()][match.group(2).trim()] = match.group(3).trim();
+    final Iterable asJson = jsonDecode(cliOutput)['runtimes'];
+    return asJson.fold<Map<String, Map<String, String>>>({}, (acc, runtime) {
+      final os = runtime['name'].replaceAll(RegExp(r'[\s\d\.]+'), '');
+      acc[os] ??= <String, String>{};
+      acc[os][runtime['version']] = runtime['identifier'];
       return acc;
     });
   }
-}
-
-Map<String, dynamic> _deviceFromString(
-  String deviceLine, {
-  OperatingSystem runtime,
-  String osVersion,
-}) {
-  if (deviceLine.contains('(unavailable')) return null;
-
-  final deviceMatch =
-      RegExp(r'\(([A-Za-z0-9\-]+)\) \(([\w\s]+)\)(?:\s\(.*\))?$')
-          .firstMatch(deviceLine.trim());
-  final name =
-      deviceLine.trim().replaceAll(deviceMatch.group(0).trim(), '').trim();
-  return {
-    'model': name.replaceAll(RegExp(r':[\d\.]*'), ''),
-    'name': name,
-    'os': runtime,
-    'osVersion': osVersion,
-    'status': deviceMatch.group(2).trim(),
-    'uuid': deviceMatch.group(1).trim(),
-  };
-}
-
-String _simulatorsFromSimctl(
-  String simctlOuput,
-  RegExpMatch match,
-  List<RegExpMatch> matches,
-) {
-  final indexOfMatch = matches.indexOf(match);
-  final runTimePosition =
-      simctlOuput.indexOf(match.group(1)) + match.group(1).length;
-  if (indexOfMatch != matches.length - 1) {
-    final startOfNextRuntimePosition =
-        simctlOuput.indexOf(matches[indexOfMatch + 1].group(1));
-    return simctlOuput.substring(runTimePosition, startOfNextRuntimePosition);
-  }
-
-  return simctlOuput.substring(runTimePosition);
 }
