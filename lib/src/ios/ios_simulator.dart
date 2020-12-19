@@ -19,6 +19,8 @@ class IosSimulator extends VirtualDevice {
 
   final String status;
 
+  /// A unique identifier used to communicate with the platform.
+  /// This is the `udid` (simctl CLI) or `identifier` (Xcode GUI).
   @override
   String uuid;
 
@@ -53,12 +55,18 @@ class IosSimulator extends VirtualDevice {
     final deviceName = name ??
         (await SimctlCli.instance
             .generateName(model: model, osVersion: osVersion));
-    uuid = await runWithError(
+
+    final createdOutput = await runWithError(
         'xcrun', ['simctl', 'create', deviceName, deviceType, runtime]);
+    uuid = createdOutput.trim();
   }
 
+  /// Start an existing simulator or create a new one
+  ///
+  /// [showAfterStart] - when `false`, the simulator is booted in the background
+  /// and not rendered by the GUI. Defaults `true`.
   @override
-  Future<void> createOrStart() async {
+  Future<void> createOrStart({bool showAfterStart = true}) async {
     if (uuid != null) {
       return await runWithError('xcrun', ['simctl', 'boot', uuid]);
     }
@@ -75,10 +83,14 @@ class IosSimulator extends VirtualDevice {
     if (device != null) {
       uuid = device.uuid;
       await device.start();
+    } else {
+      await create();
+      await start();
     }
 
-    await create();
-    await start();
+    if (showAfterStart) {
+      await runWithError('open', ['-a', 'Simulator', '--args', uuid]);
+    }
   }
 
   @override
@@ -115,7 +127,7 @@ class IosSimulator extends VirtualDevice {
   static Future<Map<String, String>> availableDeviceTypes() =>
       SimctlCli.instance.availableDeviceTypes();
 
-  /// Segment available OS versions by `verionNumber: runtimeId`. See [SimctlCli#availableRuntimes]
+  /// Segment available OS versions by `os: { verionNumber: runtimeId }`. See [SimctlCli#availableRuntimes]
   static Future<Map<String, Map<String, String>>> availableRuntimes() =>
       SimctlCli.instance.availableRuntimes();
 

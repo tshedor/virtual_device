@@ -12,15 +12,11 @@ class StopCommand extends VirtualDeviceCommand {
   final description = 'Pause a running virtual device';
 
   StopCommand() {
-    argParser.addOption(
-      'name',
-      defaultsTo: null,
-      help: 'The device name.',
-    );
     argParser.addFlag(
       'all',
       abbr: 'a',
       defaultsTo: false,
+      negatable: false,
       help: 'Stop all running devices for the platform',
     );
   }
@@ -32,15 +28,19 @@ class StopCommand extends VirtualDeviceCommand {
       if (isAndroid) return await AdbCli.instance.stopAll();
     }
 
-    if (argResults['name'] == null) {
+    if (argResults.rest?.isEmpty ?? true) {
       throw UsageException(
-          'Name must be included when --all is false', '--name "Device Name"');
+        'Name(s) must be included when --all is false',
+        'Ex. virtual_device stop "iPad Air 2:12.1:1"',
+      );
     }
 
-    final device = await deviceFromName(
-      isIOS: isIos,
-      name: argResults['name'],
-    );
-    return await device.stop();
+    for (final name in argResults.rest) {
+      final device = await deviceFromName(
+        isIOS: isIos,
+        name: name,
+      );
+      await device.stop();
+    }
   }
 }

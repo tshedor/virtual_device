@@ -11,16 +11,12 @@ class WipeCommand extends VirtualDeviceCommand {
   final description = 'Erase data from a virtual device';
 
   WipeCommand() {
-    argParser.addOption(
-      'name',
-      defaultsTo: null,
-      help: 'The device name.',
-    );
     argParser.addFlag(
       'all',
       abbr: 'a',
       defaultsTo: false,
-      help: 'Erase all data from devices for the platform. ',
+      negatable: false,
+      help: 'Erase all data from devices for the platform.',
     );
   }
 
@@ -29,20 +25,26 @@ class WipeCommand extends VirtualDeviceCommand {
     if (argResults['all']) {
       if (isIos) return await IosSimulator.wipeAll();
       if (isAndroid) {
-        throw UsageException('Wipe All is not supported currently for Android',
-            '--platform ios');
+        throw UsageException(
+          'Wipe -all is not supported currently for Android',
+          'Ex. --platform ios',
+        );
       }
     }
 
-    if (argResults['name'] == null) {
+    if (argResults.rest?.isEmpty ?? true) {
       throw UsageException(
-          'Name must be included when --all is false', '--name "Device Name"');
+        'Name(s) must be included when --all is false',
+        'Ex. virtual_device wipe "iPad Air 2:12.1:1"',
+      );
     }
 
-    final device = await deviceFromName(
-      isIOS: isIos,
-      name: argResults['name'],
-    );
-    return await device.wipe();
+    for (final name in argResults.rest) {
+      final device = await deviceFromName(
+        isIOS: isIos,
+        name: name,
+      );
+      await device.wipe();
+    }
   }
 }

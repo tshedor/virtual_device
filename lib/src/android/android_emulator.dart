@@ -6,15 +6,14 @@ import 'package:virtual_device/virtual_device.dart';
 
 class AndroidEmulator extends VirtualDevice {
   /// Discovers the emulator id if the emulator is running and assigns it
-  /// to [emulatorId].
-  Future<String> get asyncEmulatorId async {
-    if (emulatorId != null) return emulatorId;
-    final uuidAndEmulatorId = await AdbCli.instance.uuidAndEmulatorId;
+  /// to [uuid].
+  Future<String> get asyncUuid async {
+    if (uuid != null) return uuid;
+    final uuidAndEmulatorId =
+        await AdbCli.instance.internalIdentifierAndEmulatorId;
     if (uuidAndEmulatorId == null) return null;
-    return emulatorId = uuidAndEmulatorId[uuid];
+    return uuid = uuidAndEmulatorId[_internalIdentifier];
   }
-
-  String emulatorId;
 
   /// Whether to build an image with Google APIs. Defaults `true`
   final bool googleApis;
@@ -32,25 +31,35 @@ class AndroidEmulator extends VirtualDevice {
   @override
   final String osVersion;
 
+  /// A unique identifier used to communicate with the platform.
+  /// This is the `emulatorId`, e.g. `emulator-5554`.
   @override
-  final String uuid;
+  String uuid;
+
+  /// Used to discover the emulator ID after start.
+  /// Emulator IDs are difficult to determine because starting
+  /// an emulator spawns a process instead of returning the ID or even
+  /// printing it at start. Therefore, a generated ID is required to associate
+  /// started emulators. See [asyncUuid] and [start]
+  final String _internalIdentifier = Uuid().v1();
 
   AndroidEmulator({
-    this.emulatorId,
     this.googleApis = true,
     this.model,
     this.name,
     this.osVersion,
-    String uuid,
-  }) : uuid = uuid ?? Uuid().v1();
+    this.uuid,
+  });
 
   @override
   Future<void> create({bool verbose = false}) async {
     final availableVersions = await AvdmanagerCli.instance.availableRuntimes();
     final discoveredVersion = availableVersions.firstWhere(
       (v) => v['apiLevel'].toString() == osVersion,
-      orElse: () => throw StateError(
-          '$osVersion is not available in ${availableVersions.map((v) => v["apiLevel"]).join(", ")}'),
+      orElse: () {
+        final versions = availableVersions.map((v) => v['apiLevel']).join(', ');
+        throw StateError('$osVersion is not available in $versions');
+      },
     );
 
     if (discoveredVersion['googleApis'] != googleApis) {
@@ -111,16 +120,16 @@ class AndroidEmulator extends VirtualDevice {
         if (!snapshot) '-no-snapshot',
         if (wipeData) '-wipe-data',
         '-prop',
-        'emu.uuid=$uuid'
-            '>',
+        'emu.uuid=$_internalIdentifier',
+        '>',
         '/dev/null',
         '2>&1',
       ]);
 
   @override
   Future<void> stop() async {
-    final _emulatorId = await asyncEmulatorId;
-    return AdbCli.instance.stop(_emulatorId);
+    final emulatorId = await asyncUuid;
+    return AdbCli.instance.stop(emulatorId);
   }
 
   @override

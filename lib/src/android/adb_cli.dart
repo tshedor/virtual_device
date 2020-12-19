@@ -1,15 +1,16 @@
 import 'package:virtual_device/virtual_device.dart';
 
 class AdbCli {
-  /// Given a running simulator, associate the generated UUID from [AndroidEmulator]
-  Future<Map<String, String>> get uuidAndEmulatorId async {
+  /// Associate the emaultor ID by fetching the [AndroidEmulator#_internalIdentifier]
+  /// from all running simulators
+  Future<Map<String, String>> get internalIdentifierAndEmulatorId async {
     final runningAdbEmulators = await runWithError('adb', ['devices']);
     final adbMatches = RegExp(r'^emulator-\d+', multiLine: true)
         .allMatches(runningAdbEmulators);
     if (adbMatches == null || adbMatches.isEmpty) return null;
 
     // inspired by https://stackoverflow.com/a/42038655
-    final _uuidAndEmulatorId = {};
+    final uuidAndEmulatorId = {};
     for (final match in adbMatches) {
       final emulatorId = match.group(0).trim();
       final adbUuid = await runWithError('adb', [
@@ -20,10 +21,10 @@ class AdbCli {
         'getprop',
         'emu.uuid'
       ]);
-      _uuidAndEmulatorId[adbUuid.trim()] = emulatorId;
+      uuidAndEmulatorId[adbUuid.trim()] = emulatorId;
     }
 
-    return _uuidAndEmulatorId;
+    return uuidAndEmulatorId;
   }
 
   static const AdbCli instance = AdbCli._();

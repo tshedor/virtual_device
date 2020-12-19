@@ -30,7 +30,7 @@ class FlutterCli {
                 RegExp(r'\(API (\d+)\)').firstMatch(parts[3]);
 
             return AndroidEmulator(
-              emulatorId: parts[1].trim(),
+              uuid: parts[1].trim(),
               osVersion: osVersionMatch?.group(1),
             );
           }

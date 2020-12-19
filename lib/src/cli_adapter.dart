@@ -1,3 +1,5 @@
+import 'package:meta/meta.dart';
+
 abstract class CliAdapter {
   const CliAdapter();
 
@@ -10,15 +12,40 @@ abstract class CliAdapter {
   Future<String> generateName({String model, String osVersion}) async {
     final createdName = '$model:$osVersion';
     final existingDevices = await availableDevices();
-    final existingDevice = existingDevices
-        .firstWhere((d) => d['name'].contains(createdName), orElse: () => null);
-    if (existingDevice != null) {
-      final appendedVersion =
-          RegExp(r':(\d+)$').firstMatch(existingDevice['name']);
-      final version = int.tryParse(appendedVersion?.group(1) ?? '0');
-      return '$createdName:${version + 1}';
+    final existingModels = existingDevices
+        .where((d) => d['name'].contains(createdName))
+        .toList()
+        .cast<Map<String, dynamic>>();
+
+    final version = incrementForName(existingModels);
+
+    return '$createdName:$version';
+  }
+
+  /// Returns the incremented number, e.g. `3` if two previous devices exist.
+  /// Increments are only valid for names Virtual Device recognizes. If no previously
+  /// created devices exist, returns `1`.
+  @visibleForTesting
+  static int incrementForName(List<Map<String, dynamic>> existingModels) {
+    final appendedVersionRegEx = RegExp(r':(\d+)$');
+    // Sort ASC (1, 2, 3)
+    existingModels.sort((a, b) {
+      final appendedVersionARaw =
+          appendedVersionRegEx.firstMatch(a['name'])?.group(1);
+      final appendedVersionBRaw =
+          appendedVersionRegEx.firstMatch(b['name'])?.group(1);
+      final appendedVersionA = int.tryParse(appendedVersionARaw ?? '0');
+      final appendedVersionB = int.tryParse(appendedVersionBRaw ?? '0');
+      return appendedVersionA.compareTo(appendedVersionB);
+    });
+
+    if (existingModels.isEmpty) {
+      return 1;
     }
 
-    return '$createdName:1';
+    final appendedVersion =
+        appendedVersionRegEx.firstMatch(existingModels.last['name']);
+    final version = int.tryParse(appendedVersion?.group(1) ?? '0');
+    return version + 1;
   }
 }

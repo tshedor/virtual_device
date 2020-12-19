@@ -1,5 +1,12 @@
 ## Unreleased
 
+## 0.0.5
+
+* Fix device naming incrementor in `CliAdapter`
+* Remove `AndroidEmulator#emulatorId` in favor of assigning a running emulator ID to `AndroidEmulator#uuid`
+* Improve CLI documentation. Throw errors for missing, required options.
+* Rename `create --osVersion` to `create --os-version` for naming consistency with other options
+
 ## 0.0.4
 
 * Reassign UUID in `IosSimulator` when starting

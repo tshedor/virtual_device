@@ -25,7 +25,6 @@ class _Devices extends VirtualDeviceCommand {
 
   @override
   Future<void> run() async {
-    // print(argResults['platform']);
     if (isIos) {
       final devices = await IosSimulator.availableDevices();
       return print(devices.join('\n'));
@@ -44,6 +43,9 @@ class _Models extends VirtualDeviceCommand {
 
   @override
   final description = 'List available models';
+
+  @override
+  final aliases = <String>['devicetypes'];
 
   @override
   Future<void> run() async {
@@ -67,11 +69,14 @@ class _Versions extends VirtualDeviceCommand {
   final description = 'List OS versions and runtimes';
 
   @override
+  final aliases = <String>['runtimes'];
+
+  @override
   Future<void> run() async {
     if (isIos) {
       final versions = await IosSimulator.availableRuntimes();
       final output = versions.entries.map((entry) {
-        return '${entry.key}: ${entry.value.keys.join(", ")}';
+        return '${entry.key}: ${entry.value.keys.join(",")}';
       });
       return print(output.join('\n'));
     }

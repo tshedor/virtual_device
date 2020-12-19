@@ -30,7 +30,7 @@ void main() {
       test('multiple devices', () {
         final results = FlutterCli.parseAvailableDevices(multiDevices);
         expect(results.first.osVersion, '25');
-        expect((results.first as AndroidEmulator).emulatorId, 'emulator-5554');
+        expect(results.first.uuid, 'emulator-5554');
         expect(results.last.uuid, 'ABDJ29301-1B3H-JD93-BF12-12J2J2J2J48S');
       });
     });

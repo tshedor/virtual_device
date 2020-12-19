@@ -24,7 +24,7 @@ class SimctlCli extends CliAdapter {
     return parseDeviceTypesOutput(cliOutput);
   }
 
-  /// Segment available OS versions by `verionNumber: runtimeId`
+  /// Segment available OS versions by `os: { verionNumber: runtimeId }`
   Future<Map<String, Map<String, String>>> availableRuntimes() async {
     final cliOutput =
         await runWithError('xcrun', ['simctl', 'list', '--json', 'runtimes']);
