@@ -1,5 +1,7 @@
 ## Unreleased
 
+## 0.0.4
+
 * Reassign UUID in `IosSimulator` when starting
 * Format new availableRuntimes output
 * Parse simctl with JSON
