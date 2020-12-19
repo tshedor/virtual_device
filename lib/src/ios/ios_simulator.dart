@@ -65,14 +65,16 @@ class IosSimulator extends VirtualDevice {
 
     final devices = await availableDevices();
     final device = devices.firstWhere(
-        (d) =>
-            d.os == os &&
-            d.osVersion == osVersion &&
-            d.status == 'Shutdown' &&
-            d.model == model,
-        orElse: () => null);
+      (d) =>
+          d.os == os &&
+          d.osVersion == osVersion &&
+          d.status == 'Shutdown' &&
+          d.model == model,
+      orElse: () => null,
+    );
     if (device != null) {
-      return await device.start();
+      uuid = device.uuid;
+      await device.start();
     }
 
     await create();
