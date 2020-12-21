@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.0.5+1
+
+* Fix iOS simulator discovery when runtime is specified by `simctl` instead of a humanized OS/version
+
 ## 0.0.5
 
 * Fix device naming incrementor in `CliAdapter`

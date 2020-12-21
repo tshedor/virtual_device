@@ -37,11 +37,30 @@ class SimctlCli extends CliAdapter {
     final Map asJson = jsonDecode(cliOutput)['devices'];
     return asJson.entries
         .map((entry) {
+          String osValue;
+          String osVersion;
+
+          // For "com.apple.CoreSimulator.SimRuntime.iOS-14-2"
+          final asRuntime =
+              RegExp(r'(\w+)-(\d+)-?(\d+)?-?(\d+)?').firstMatch(entry.key);
+          if (asRuntime != null) {
+            osValue = asRuntime?.group(1);
+            osVersion = [
+              asRuntime.group(2),
+              asRuntime.group(3),
+              asRuntime.group(4)
+            ].where((v) => v != null).join('.');
+          } else {
+            // For "iOS 14.2"
+            osValue = entry.key.replaceAll(RegExp(r'[^a-zA-Z]+'), '');
+            osVersion = entry.key.replaceAll(RegExp(r'[^\d\.]+'), '');
+          }
+
           final os = OperatingSystem.values.firstWhere(
-              (o) =>
-                  o.toString().split('.').last ==
-                  entry.key.replaceAll(RegExp(r'[\s\.\d]+'), ''),
-              orElse: () => null);
+            (o) => o.toString().split('.').last == osValue,
+            orElse: () => null,
+          );
+
           if (os == null) return null;
 
           return entry.value.map((device) {
@@ -51,7 +70,7 @@ class SimctlCli extends CliAdapter {
               'model': device['name'].replaceAll(RegExp(r':[\d\.]*'), ''),
               'name': device['name'],
               'os': os,
-              'osVersion': entry.key.replaceAll(RegExp(r'[^\d\.]+'), ''),
+              'osVersion': osVersion,
               'status': device['state'],
               'uuid': device['udid'],
             };

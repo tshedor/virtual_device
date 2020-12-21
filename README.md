@@ -1,6 +1,6 @@
 # Virtual Device
 
-Manage/Create iOS simulators and Android emulators
+Manage one or many iOS simulators and Android emulators
 
 ## Setup
 
@@ -60,7 +60,7 @@ And use it to create or run simulators:
 
 ```shell
 virtual_device create -p ios -v 14.2 -m "iPad Air 2"
-virtual_device start -p ios -n "iPad Air 2:14.2:1"
+virtual_device start -p ios "iPad Air 2:14.2:1"
 ```
 
 For a complete list of models and versions available on the machine, run `virtual_device list models` or `virtual_device list versions`.

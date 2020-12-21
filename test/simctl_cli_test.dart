@@ -5,13 +5,21 @@ import 'package:virtual_device/src/virtual_device.dart';
 void main() {
   group('SimctlCli', () {
     test('.parseDevicesOutput', () {
-      final result = SimctlCli.parseDevicesOutput(listDevices);
-      expect(result, hasLength(5));
-      expect(result.first, {
+      final result = SimctlCli.parseDevicesOutput(listDevices).toList();
+      expect(result, hasLength(7));
+      expect(result[2], {
         'model': 'iPhone 5s',
         'name': 'iPhone 5s',
         'os': OperatingSystem.iOS,
         'osVersion': '12.1',
+        'status': 'Shutdown',
+        'uuid': '09F9F55E-D9ED-4FA5-9F13-67BB8874A3FE'
+      });
+      expect(result.first, {
+        'model': 'iPhone 5s',
+        'name': 'iPhone 5s',
+        'os': OperatingSystem.iOS,
+        'osVersion': '12.0',
         'status': 'Shutdown',
         'uuid': '09F9F55E-D9ED-4FA5-9F13-67BB8874A3FE'
       });
@@ -156,6 +164,24 @@ const listDevices = '''{
       }
     ],
     "iOS 12.1" : [
+      {
+        "availability" : "(available)",
+        "state" : "Shutdown",
+        "isAvailable" : true,
+        "name" : "iPhone 5s",
+        "udid" : "09F9F55E-D9ED-4FA5-9F13-67BB8874A3FE",
+        "availabilityError" : ""
+      },
+      {
+        "availability" : "(available)",
+        "state" : "Shutdown",
+        "isAvailable" : true,
+        "name" : "iPhone 6",
+        "udid" : "25130F1E-E829-413E-A57F-C5FB000BF812",
+        "availabilityError" : ""
+      }
+    ],
+    "com.apple.CoreSimulator.SimRuntime.iOS-12-0" : [
       {
         "availability" : "(available)",
         "state" : "Shutdown",
