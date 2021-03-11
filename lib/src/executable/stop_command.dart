@@ -23,19 +23,19 @@ class StopCommand extends VirtualDeviceCommand {
 
   @override
   Future<void> run() async {
-    if (argResults['all']) {
+    if (argResults?['all'] ?? false) {
       if (isIos) return await IosSimulator.stopAll();
       if (isAndroid) return await AdbCli.instance.stopAll();
     }
 
-    if (argResults.rest?.isEmpty ?? true) {
+    if (argResults?.rest.isEmpty ?? true) {
       throw UsageException(
         'Name(s) must be included when --all is false',
         'Ex. virtual_device stop "iPad Air 2:12.1:1"',
       );
     }
 
-    for (final name in argResults.rest) {
+    for (final name in argResults?.rest ?? []) {
       final device = await deviceFromName(
         isIOS: isIos,
         name: name,

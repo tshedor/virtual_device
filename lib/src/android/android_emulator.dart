@@ -2,17 +2,17 @@ import 'package:uuid/uuid.dart';
 import 'package:virtual_device/src/android/adb_cli.dart';
 import 'package:virtual_device/src/android/avdmanager_cli.dart';
 import 'package:virtual_device/src/virtual_device.dart';
+import 'package:virtual_device/src/virtual_device_utils.dart';
 import 'package:virtual_device/virtual_device.dart';
 
 class AndroidEmulator extends VirtualDevice {
   /// Discovers the emulator id if the emulator is running and assigns it
   /// to [uuid].
-  Future<String> get asyncUuid async {
-    if (uuid != null) return uuid;
-    final uuidAndEmulatorId =
-        await AdbCli.instance.internalIdentifierAndEmulatorId;
+  Future<String?> get asyncUuid async {
+    if (uuid != null) return uuid!;
+    final uuidAndEmulatorId = await AdbCli.instance.internalIdentifierAndEmulatorId;
     if (uuidAndEmulatorId == null) return null;
-    return uuid = uuidAndEmulatorId[_internalIdentifier];
+    return uuid = uuidAndEmulatorId[_internalIdentifier]!;
   }
 
   /// Whether to build an image with Google APIs. Defaults `true`
@@ -22,7 +22,7 @@ class AndroidEmulator extends VirtualDevice {
   final String model;
 
   @override
-  final String name;
+  final String? name;
 
   @override
   final os = OperatingSystem.android;
@@ -34,7 +34,7 @@ class AndroidEmulator extends VirtualDevice {
   /// A unique identifier used to communicate with the platform.
   /// This is the `emulatorId`, e.g. `emulator-5554`.
   @override
-  String uuid;
+  String? uuid;
 
   /// Used to discover the emulator ID after start.
   /// Emulator IDs are difficult to determine because starting
@@ -45,9 +45,9 @@ class AndroidEmulator extends VirtualDevice {
 
   AndroidEmulator({
     this.googleApis = true,
-    this.model,
+    required this.model,
     this.name,
-    this.osVersion,
+    required this.osVersion,
     this.uuid,
   });
 
@@ -63,17 +63,15 @@ class AndroidEmulator extends VirtualDevice {
     );
 
     if (discoveredVersion['googleApis'] != googleApis) {
-      throw StateError(
-          '$osVersion does not have a compatible Google APIs ($googleApis) image');
+      throw StateError('$osVersion does not have a compatible Google APIs ($googleApis) image');
     }
 
     final imageName = ['system-images' 'android-$osVersion'];
     if (googleApis) imageName.add('google_apis');
     imageName.add('x86');
 
-    final deviceName = name ??
-        (await AvdmanagerCli.instance
-            .generateName(model: model, osVersion: osVersion));
+    final deviceName =
+        name ?? (await AvdmanagerCli.instance.generateName(model: model, osVersion: osVersion));
 
     await runWithError('avdmanager', [
       if (verbose) '--verbose',
@@ -92,9 +90,10 @@ class AndroidEmulator extends VirtualDevice {
   @override
   Future<void> createOrStart() async {
     final devices = await availableDevices();
-    final device = devices.firstWhere(
-        (d) => d.os == os && d.osVersion == osVersion && d.model == model,
-        orElse: () => null);
+    final device = firstWhereOrNull<AndroidEmulator>(
+      devices,
+      (d) => d.os == os && d.osVersion == osVersion && d.model == model,
+    );
     if (device != null) {
       return await device.start();
     }
@@ -104,8 +103,7 @@ class AndroidEmulator extends VirtualDevice {
   }
 
   @override
-  Future<void> delete() =>
-      runWithError('emulator', ['delete', 'avd', '-n', name]);
+  Future<void> delete() => runWithError('emulator', ['delete', 'avd', '-n', name!]);
 
   @override
   Future<void> start({
@@ -115,7 +113,7 @@ class AndroidEmulator extends VirtualDevice {
   }) =>
       runWithError('emulator', [
         '-avd',
-        name,
+        name!,
         if (!bootAnimation) '-no-boot-anim',
         if (!snapshot) '-no-snapshot',
         if (wipeData) '-wipe-data',
@@ -129,11 +127,11 @@ class AndroidEmulator extends VirtualDevice {
   @override
   Future<void> stop() async {
     final emulatorId = await asyncUuid;
-    return AdbCli.instance.stop(emulatorId);
+    if (emulatorId != null) return AdbCli.instance.stop(emulatorId!);
   }
 
   @override
-  Future<void> wipe() => runWithError('emulator', ['avd', name, '-wipe-data']);
+  Future<void> wipe() => runWithError('emulator', ['avd', name!, '-wipe-data']);
 
   /// Created and available emulators
   static Future<List<AndroidEmulator>> availableDevices() async {

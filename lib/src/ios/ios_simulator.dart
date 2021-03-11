@@ -2,6 +2,7 @@ import 'package:meta/meta.dart';
 import 'package:virtual_device/src/ios/simctl_cli.dart';
 
 import 'package:virtual_device/src/virtual_device.dart';
+import 'package:virtual_device/src/virtual_device_utils.dart';
 import 'package:virtual_device/virtual_device.dart';
 
 class IosSimulator extends VirtualDevice {
@@ -9,7 +10,7 @@ class IosSimulator extends VirtualDevice {
   final String model;
 
   @override
-  final String name;
+  final String? name;
 
   @override
   final OperatingSystem os;
@@ -17,18 +18,18 @@ class IosSimulator extends VirtualDevice {
   @override
   final String osVersion;
 
-  final String status;
+  final String? status;
 
   /// A unique identifier used to communicate with the platform.
   /// This is the `udid` (simctl CLI) or `identifier` (Xcode GUI).
   @override
-  String uuid;
+  String? uuid;
 
   IosSimulator({
-    @required this.model,
+    required this.model,
     this.name,
-    @required this.osVersion,
-    @required this.os,
+    required this.osVersion,
+    required this.os,
     this.status,
     this.uuid,
   });
@@ -38,8 +39,7 @@ class IosSimulator extends VirtualDevice {
     final deviceTypes = await SimctlCli.instance.availableDeviceTypes();
     final deviceType = deviceTypes[model];
     if (deviceType == null) {
-      throw StateError(
-          '$model is not available in ${deviceTypes.keys.join(", ")}');
+      throw StateError('$model is not available in ${deviceTypes.keys.join(", ")}');
     }
 
     final runtimes = await SimctlCli.instance.availableRuntimes();
@@ -48,16 +48,15 @@ class IosSimulator extends VirtualDevice {
       throw StateError('No runtimes available for $osVersion');
     }
 
-    final runtimeKey = runtimesForOs.keys.firstWhere((e) => e == osVersion,
-        orElse: () => throw StateError(
-            '$osVersion is not available from ${runtimesForOs.keys.join(", ")}'));
-    final runtime = runtimesForOs[runtimeKey];
-    final deviceName = name ??
-        (await SimctlCli.instance
-            .generateName(model: model, osVersion: osVersion));
+    final runtimeKey = runtimesForOs!.keys.firstWhere((e) => e == osVersion,
+        orElse: () =>
+            throw StateError('$osVersion is not available from ${runtimesForOs.keys.join(", ")}'));
+    final runtime = runtimesForOs[runtimeKey]!;
+    final deviceName =
+        name ?? (await SimctlCli.instance.generateName(model: model, osVersion: osVersion));
 
-    final createdOutput = await runWithError(
-        'xcrun', ['simctl', 'create', deviceName, deviceType, runtime]);
+    final createdOutput =
+        await runWithError('xcrun', ['simctl', 'create', deviceName, deviceType, runtime]);
     uuid = createdOutput.trim();
   }
 
@@ -68,17 +67,14 @@ class IosSimulator extends VirtualDevice {
   @override
   Future<void> createOrStart({bool showAfterStart = true}) async {
     if (uuid != null) {
-      return await runWithError('xcrun', ['simctl', 'boot', uuid]);
+      await runWithError('xcrun', ['simctl', 'boot', uuid!]);
+      return;
     }
 
     final devices = await availableDevices();
-    final device = devices.firstWhere(
-      (d) =>
-          d.os == os &&
-          d.osVersion == osVersion &&
-          d.status == 'Shutdown' &&
-          d.model == model,
-      orElse: () => null,
+    final device = firstWhereOrNull<IosSimulator>(
+      devices,
+      (d) => d.os == os && d.osVersion == osVersion && d.status == 'Shutdown' && d.model == model,
     );
     if (device != null) {
       uuid = device.uuid;
@@ -89,21 +85,21 @@ class IosSimulator extends VirtualDevice {
     }
 
     if (showAfterStart) {
-      await runWithError('open', ['-a', 'Simulator', '--args', uuid]);
+      await runWithError('open', ['-a', 'Simulator', '--args', uuid!]);
     }
   }
 
   @override
-  Future<void> delete() => runWithError('xcrun', ['simctl', 'delete', uuid]);
+  Future<void> delete() => runWithError('xcrun', ['simctl', 'delete', uuid!]);
 
   @override
-  Future<void> start() => runWithError('xcrun', ['simctl', 'boot', uuid]);
+  Future<void> start() => runWithError('xcrun', ['simctl', 'boot', uuid!]);
 
   @override
-  Future<void> stop() => runWithError('xcrun', ['simctl', 'shutdown', uuid]);
+  Future<void> stop() => runWithError('xcrun', ['simctl', 'shutdown', uuid!]);
 
   @override
-  Future<void> wipe() => runWithError('xcrun', ['simctl', 'erase', uuid]);
+  Future<void> wipe() => runWithError('xcrun', ['simctl', 'erase', uuid!]);
 
   /// Created and available simulators
   static Future<List<IosSimulator>> availableDevices() async {
@@ -131,10 +127,8 @@ class IosSimulator extends VirtualDevice {
   static Future<Map<String, Map<String, String>>> availableRuntimes() =>
       SimctlCli.instance.availableRuntimes();
 
-  static Future<void> stopAll() =>
-      runWithError('xcrun', ['simctl', 'shutdown', 'all']);
+  static Future<void> stopAll() => runWithError('xcrun', ['simctl', 'shutdown', 'all']);
 
   /// Wipe data from all simulators
-  static Future<void> wipeAll() =>
-      runWithError('xcrun', ['simctl', 'erase', 'all']);
+  static Future<void> wipeAll() => runWithError('xcrun', ['simctl', 'erase', 'all']);
 }

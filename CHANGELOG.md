@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 1.0.0-nullsafety.0
+
+* Migrate to sound null safety
+
 ## 0.0.5+1
 
 * Fix iOS simulator discovery when runtime is specified by `simctl` instead of a humanized OS/version
