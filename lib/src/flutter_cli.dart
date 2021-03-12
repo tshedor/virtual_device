@@ -44,7 +44,7 @@ class FlutterCli {
 
           final generatedByVirtualDevice = RegExp(r'(.*):([\d\.]+):\d+').firstMatch(parts[0]);
           return IosSimulator(
-            model: generatedByVirtualDevice?.group(1) ?? '',
+            model: generatedByVirtualDevice?.group(1),
             name: parts[0].trim(),
             os: os,
             osVersion: generatedByVirtualDevice?.group(2) ?? osVersion!,

@@ -6,7 +6,7 @@ import 'package:virtual_device/virtual_device.dart';
 
 class IosSimulator extends VirtualDevice {
   @override
-  final String model;
+  final String? model;
 
   @override
   final String? name;
@@ -25,7 +25,7 @@ class IosSimulator extends VirtualDevice {
   String? uuid;
 
   IosSimulator({
-    required this.model,
+    this.model,
     this.name,
     required this.osVersion,
     required this.os,
@@ -52,7 +52,7 @@ class IosSimulator extends VirtualDevice {
             throw StateError('$osVersion is not available from ${runtimesForOs.keys.join(", ")}'));
     final runtime = runtimesForOs[runtimeKey]!;
     final deviceName =
-        name ?? (await SimctlCli.instance.generateName(model: model, osVersion: osVersion));
+        name ?? (await SimctlCli.instance.generateName(model: model!, osVersion: osVersion));
 
     final createdOutput =
         await runWithError('xcrun', ['simctl', 'create', deviceName, deviceType, runtime]);
