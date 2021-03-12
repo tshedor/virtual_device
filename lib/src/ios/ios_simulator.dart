@@ -1,4 +1,3 @@
-import 'package:meta/meta.dart';
 import 'package:virtual_device/src/ios/simctl_cli.dart';
 
 import 'package:virtual_device/src/virtual_device.dart';

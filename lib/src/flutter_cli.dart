@@ -26,12 +26,12 @@ class FlutterCli {
           final parts = device.split('•');
 
           if (device.toLowerCase().contains('android')) {
-            final osVersionMatch =
-                RegExp(r'\(API (\d+)\)').firstMatch(parts[3]);
+            final osVersionMatch = RegExp(r'\(API (\d+)\)').firstMatch(parts[3]);
 
             return AndroidEmulator(
+              model: 'emulator',
               uuid: parts[1].trim(),
-              osVersion: osVersionMatch?.group(1),
+              osVersion: osVersionMatch!.group(1)!,
             );
           }
 
@@ -42,13 +42,12 @@ class FlutterCli {
           final osVersionMatch = RegExp(r'(\d+)-(\d+)').firstMatch(parts[3]);
           final osVersion = osVersionMatch?.group(0)?.replaceAll('-', '.');
 
-          final generatedByVirtualDevice =
-              RegExp(r'(.*):([\d\.]+):\d+').firstMatch(parts[0]);
+          final generatedByVirtualDevice = RegExp(r'(.*):([\d\.]+):\d+').firstMatch(parts[0]);
           return IosSimulator(
-            model: generatedByVirtualDevice?.group(1),
+            model: generatedByVirtualDevice?.group(1) ?? '',
             name: parts[0].trim(),
             os: os,
-            osVersion: generatedByVirtualDevice?.group(2) ?? osVersion,
+            osVersion: generatedByVirtualDevice?.group(2) ?? osVersion!,
             uuid: parts[1].trim(),
           );
         })

@@ -10,7 +10,7 @@ enum OperatingSystem {
 
 abstract class VirtualDevice {
   /// Example: "iPad Air 2"
-  String get model;
+  String? get model;
 
   /// The humanized name of the device.
   /// Implementers of [VirtualDevice] should generate the name in a way that increments

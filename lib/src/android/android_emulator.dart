@@ -127,7 +127,7 @@ class AndroidEmulator extends VirtualDevice {
   @override
   Future<void> stop() async {
     final emulatorId = await asyncUuid;
-    if (emulatorId != null) return AdbCli.instance.stop(emulatorId!);
+    if (emulatorId != null) return AdbCli.instance.stop(emulatorId);
   }
 
   @override
@@ -150,10 +150,10 @@ class AndroidEmulator extends VirtualDevice {
   }
 
   /// Segment available emulator types into digestible Maps. See [AvdmanagerCli#availableDeviceTypes]
-  static Future<Iterable<Map<String, String>>> availableDeviceTypes() =>
+  static Future<Iterable<Map<String, dynamic>>> availableDeviceTypes() =>
       AvdmanagerCli.instance.availableDeviceTypes();
 
   /// Segment available Android versions into digestible Maps. See [AvdmanagerCli#availableRuntimes]
-  static Future<Iterable<Map<String, String>>> availableRuntimes() =>
+  static Future<Iterable<Map<String, dynamic>>> availableRuntimes() =>
       AvdmanagerCli.instance.availableRuntimes();
 }
