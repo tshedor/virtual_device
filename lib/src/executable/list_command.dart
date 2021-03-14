@@ -85,7 +85,7 @@ class _Versions extends VirtualDeviceCommand {
       final versions = await AvdmanagerCli.instance.availableRuntimes();
       final humanized = versions.map((v) {
         var output = v['apiLevel'];
-        if (output['googleApis']) {
+        if (output?['googleApis'] ?? false) {
           output += ' (Google APIs available)';
         }
         return output;

@@ -38,18 +38,16 @@ void main() {
       expect(result, hasLength(9));
       expect(result['iPad Pro (9.7-inch)'],
           'com.apple.CoreSimulator.SimDeviceType.iPad-Pro--9-7-inch-');
-      expect(result['Apple Watch - 42mm'],
-          'com.apple.CoreSimulator.SimDeviceType.Apple-Watch-42mm');
+      expect(
+          result['Apple Watch - 42mm'], 'com.apple.CoreSimulator.SimDeviceType.Apple-Watch-42mm');
     });
 
     test('.parseRuntimesOutput', () {
       final result = SimctlCli.parseRuntimesOutput(listRuntimesOutput);
       expect(result, hasLength(3));
       expect(result['iOS'], hasLength(2));
-      expect(
-          result['iOS']['8.4'], 'com.apple.CoreSimulator.SimRuntime.iOS-8-4');
-      expect(result['watchOS']['5.1'],
-          'com.apple.CoreSimulator.SimRuntime.watchOS-5-1');
+      expect(result['iOS']!['8.4'], 'com.apple.CoreSimulator.SimRuntime.iOS-8-4');
+      expect(result['watchOS']!['5.1'], 'com.apple.CoreSimulator.SimRuntime.watchOS-5-1');
     });
   });
 }

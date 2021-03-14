@@ -1,6 +1,6 @@
 import 'package:virtual_device/virtual_device.dart';
 
-Future<VirtualDevice> deviceFromName({bool isIOS = true, String name}) async {
+Future<VirtualDevice> deviceFromName({bool isIOS = true, required String name}) async {
   List<VirtualDevice> devices;
   if (isIOS) {
     devices = await IosSimulator.availableDevices();

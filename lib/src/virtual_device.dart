@@ -10,12 +10,12 @@ enum OperatingSystem {
 
 abstract class VirtualDevice {
   /// Example: "iPad Air 2"
-  String get model;
+  String? get model;
 
   /// The humanized name of the device.
   /// Implementers of [VirtualDevice] should generate the name in a way that increments
   /// prior creations of the [model] and [osVersion].
-  String get name;
+  String? get name;
 
   OperatingSystem get os;
 
@@ -23,7 +23,7 @@ abstract class VirtualDevice {
   String get osVersion;
 
   /// A unique identifier used to communicate with the platform.
-  String get uuid;
+  String? get uuid;
 
   /// Creates a new version of the device. [uuid] is usually assigned
   /// by the platform within this method.
@@ -44,8 +44,7 @@ abstract class VirtualDevice {
   Future<void> stop();
 
   @override
-  String toString() =>
-      '$name / $model / ${os.toString().split(".").last} $osVersion / $uuid';
+  String toString() => '$name / $model / ${os.toString().split(".").last} $osVersion / $uuid';
 
   /// Remove all data from the device. To permanently remove the device, see [delete].
   Future<void> wipe();
@@ -55,8 +54,7 @@ abstract class VirtualDevice {
 Future<String> runWithError(String cmd, List<String> args) async {
   final processOutput = await Process.run(cmd, args);
 
-  if (processOutput.stderr != null &&
-      processOutput.stderr.toString().isNotEmpty) {
+  if (processOutput.stderr != null && processOutput.stderr.toString().isNotEmpty) {
     throw StateError(processOutput.stderr);
   }
 

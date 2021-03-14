@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:meta/meta.dart';
 import 'package:virtual_device/src/cli_adapter.dart';
 import 'package:virtual_device/src/virtual_device.dart';
+import 'package:virtual_device/src/virtual_device_utils.dart';
 
 /// A helper class to parse commandline output from `simctl`
 class SimctlCli extends CliAdapter {
@@ -12,22 +13,19 @@ class SimctlCli extends CliAdapter {
 
   @override
   Future<Iterable<Map<String, dynamic>>> availableDevices() async {
-    final cliOutput =
-        await runWithError('xcrun', ['simctl', 'list', '--json', 'devices']);
+    final cliOutput = await runWithError('xcrun', ['simctl', 'list', '--json', 'devices']);
     return parseDevicesOutput(cliOutput);
   }
 
   /// Segment available devices by `humanizedDeviceName: deviceTypeId`
   Future<Map<String, String>> availableDeviceTypes() async {
-    final cliOutput = await runWithError(
-        'xcrun', ['simctl', 'list', '--json', 'devicetypes']);
+    final cliOutput = await runWithError('xcrun', ['simctl', 'list', '--json', 'devicetypes']);
     return parseDeviceTypesOutput(cliOutput);
   }
 
   /// Segment available OS versions by `os: { verionNumber: runtimeId }`
   Future<Map<String, Map<String, String>>> availableRuntimes() async {
-    final cliOutput =
-        await runWithError('xcrun', ['simctl', 'list', '--json', 'runtimes']);
+    final cliOutput = await runWithError('xcrun', ['simctl', 'list', '--json', 'runtimes']);
     return parseRuntimesOutput(cliOutput);
   }
 
@@ -37,28 +35,25 @@ class SimctlCli extends CliAdapter {
     final Map asJson = jsonDecode(cliOutput)['devices'];
     return asJson.entries
         .map((entry) {
-          String osValue;
+          String? osValue;
           String osVersion;
 
           // For "com.apple.CoreSimulator.SimRuntime.iOS-14-2"
-          final asRuntime =
-              RegExp(r'(\w+)-(\d+)-?(\d+)?-?(\d+)?').firstMatch(entry.key);
+          final asRuntime = RegExp(r'(\w+)-(\d+)-?(\d+)?-?(\d+)?').firstMatch(entry.key);
           if (asRuntime != null) {
-            osValue = asRuntime?.group(1);
-            osVersion = [
-              asRuntime.group(2),
-              asRuntime.group(3),
-              asRuntime.group(4)
-            ].where((v) => v != null).join('.');
+            osValue = asRuntime.group(1);
+            osVersion = [asRuntime.group(2), asRuntime.group(3), asRuntime.group(4)]
+                .where((v) => v != null)
+                .join('.');
           } else {
             // For "iOS 14.2"
             osValue = entry.key.replaceAll(RegExp(r'[^a-zA-Z]+'), '');
             osVersion = entry.key.replaceAll(RegExp(r'[^\d\.]+'), '');
           }
 
-          final os = OperatingSystem.values.firstWhere(
+          final os = firstWhereOrNull<OperatingSystem>(
+            OperatingSystem.values,
             (o) => o.toString().split('.').last == osValue,
-            orElse: () => null,
           );
 
           if (os == null) return null;
@@ -94,13 +89,12 @@ class SimctlCli extends CliAdapter {
 
   /// Extracted for testing from [availableRuntimes]
   @visibleForTesting
-  static Map<String, Map<String, String>> parseRuntimesOutput(
-      String cliOutput) {
+  static Map<String, Map<String, String>> parseRuntimesOutput(String cliOutput) {
     final Iterable asJson = jsonDecode(cliOutput)['runtimes'];
     return asJson.fold<Map<String, Map<String, String>>>({}, (acc, runtime) {
       final os = runtime['name'].replaceAll(RegExp(r'[\s\d\.]+'), '');
       acc[os] ??= <String, String>{};
-      acc[os][runtime['version']] = runtime['identifier'];
+      acc[os]![runtime['version']] = runtime['identifier'];
       return acc;
     });
   }

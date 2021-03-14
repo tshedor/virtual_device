@@ -27,8 +27,7 @@ class CreateCommand extends VirtualDeviceCommand {
       abbr: 'o',
       defaultsTo: 'iOS',
       allowed: ['iOS', 'watchOS', 'tvOS'],
-      help:
-          'The OS, such as "iOS". This is only available for Apple simulators.',
+      help: 'The OS, such as "iOS". This is only available for Apple simulators.',
     );
     argParser.addOption(
       'os-version',
@@ -40,13 +39,13 @@ class CreateCommand extends VirtualDeviceCommand {
   @override
   Future<void> run() async {
     VirtualDevice device;
-    if (argResults['model'] == null) {
+    if (argResults?['model'] == null) {
       throw UsageException(
         '--model is required',
         'Ex. --model "iPad Air 2"',
       );
     }
-    if (argResults['os-version'] == null) {
+    if (argResults?['os-version'] == null) {
       throw UsageException(
         '--os-version is required',
         'Ex. --os-version 12.1',
@@ -55,25 +54,23 @@ class CreateCommand extends VirtualDeviceCommand {
 
     if (isIos) {
       final os = OperatingSystem.values
-          .firstWhere((e) => e.toString().split('.').last == argResults['os']);
+          .firstWhere((e) => e.toString().split('.').last == argResults?['os']);
       device = IosSimulator(
-        model: argResults['model'],
-        name: argResults['name'],
+        model: argResults?['model'],
+        name: argResults?['name'],
         os: os,
-        osVersion: argResults['os-version'],
+        osVersion: argResults?['os-version'],
       );
-    }
-
-    if (isAndroid) {
-      if (argResults['os'] != null) {
-        print(
-            '--os is only available for Apple devices; ignoring ${argResults["os"]}');
+    } else {
+      // isAndroid
+      if (argResults?['os'] != null) {
+        print('--os is only available for Apple devices; ignoring ${argResults?["os"]}');
       }
 
       device = AndroidEmulator(
-        model: argResults['model'],
-        name: argResults['name'],
-        osVersion: argResults['os-version'],
+        model: argResults?['model'],
+        name: argResults?['name'],
+        osVersion: argResults?['os-version'],
       );
     }
 

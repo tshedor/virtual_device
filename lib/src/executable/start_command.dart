@@ -14,14 +14,14 @@ class StartCommand extends VirtualDeviceCommand {
 
   @override
   Future<void> run() async {
-    if (argResults.rest?.isEmpty ?? true) {
+    if (argResults?.rest.isEmpty ?? true) {
       throw UsageException(
         'The name of the device(s) is required',
         'Ex. virtual_device start "iPad Air 2:12.1:1"',
       );
     }
 
-    for (final name in argResults.rest) {
+    for (final name in argResults?.rest ?? []) {
       final device = await deviceFromName(
         isIOS: isIos,
         name: name,
