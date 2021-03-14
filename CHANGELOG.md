@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 1.0.0
+
+* Null safety is stable
+
 ## 1.0.0-nullsafety.0
 
 * Migrate to sound null safety
