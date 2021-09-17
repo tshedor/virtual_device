@@ -47,7 +47,7 @@ class FlutterCli {
             model: generatedByVirtualDevice?.group(1),
             name: parts[0].trim(),
             os: os,
-            osVersion: generatedByVirtualDevice?.group(2) ?? osVersion!,
+            osVersion: generatedByVirtualDevice?.group(2) ?? osVersion ?? '',
             uuid: parts[1].trim(),
           );
         })
