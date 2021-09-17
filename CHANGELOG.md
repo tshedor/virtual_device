@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 1.0.1
+
+* Fix null safe exception when using virtual device from CLI
+
 ## 1.0.0
 
 * Null safety is stable
